@@ -14,6 +14,8 @@ for functional in */; do
         true
       elif `grep -q "End time" ${file}.out`; then
         i=$((i+1))
+      elif `grep -q "Psi4 exiting successfully" ${file}.out`; then
+        i=$((i+1))
       fi
     done
     if [[ ${i} != ${n} ]]; then

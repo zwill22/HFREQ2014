@@ -1,3 +1,5 @@
+#!/sw/lang/anaconda.3.8-2020.07/bin/python
+
 import os
 import pandas as pd
 
@@ -33,20 +35,40 @@ def get_dir_data(folder):
     return all_data
 
 
-def main(folder):
+def get_basis_data(folder):
     output_data = {}
     for grad_dir in os.listdir(folder):
         full_dir = os.path.join(folder, grad_dir)
         if os.path.isdir(full_dir):
             output_data[grad_dir] = get_dir_data(full_dir)
 
-    pd.DataFrame(output_data).to_csv("struct_data.csv")
+    return pd.DataFrame(output_data)
 
 
-if __name__ == '__main__':
-    import sys
-    folder = sys.argv[1]
-    path = os.path.abspath(folder)
-    print(path)
-    main(path)
+def get_all_results():
+    results = {}
+    for folder in os.listdir():
+        if not os.path.isdir(folder):
+            continue
+        if folder[0] == ".":
+            continue
+        path = os.path.abspath(folder)
+
+        results[folder] = get_basis_data(path)
+
+    return results
+
+
+def main():
+    results = get_all_results()
+    for name, df in results.items():
+        mapper = {k: name + "_" + k for k in df.keys()}
+        results[name] = df.rename(columns=mapper)
+        
+    pd.concat([df for df in results.values()], axis=1).to_csv("struct_data.csv")
+
+
+if __name__ == "__main__":
+    main()
+
 
